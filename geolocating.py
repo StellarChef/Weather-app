@@ -1,20 +1,13 @@
 import requests
 from pydantic import BaseModel
+from models import City
 import json
 
 
-class Cords(BaseModel):
-    latitude: float
-    longitude: float
+class Service:
 
-
-class Weather:
-    def __init__(self, city_name: str):
-        self.city = city_name
-        self.coords = self._geolocate(city_name)
-        self.temperature = self._fetch_weather()
-
-    def _geolocate(self, city_name: str) -> dict:
+    @staticmethod
+    def geolocate(city_name: str) -> dict:
         resp = requests.get(
             "https://geocoding-api.open-meteo.com/v1/search",
             params={"name": city_name, "format": "json"},
@@ -22,27 +15,31 @@ class Weather:
         data = resp.json()
         lat = data["results"][0]["latitude"]
         lon = data["results"][0]["longitude"]
-        return {"latitude": lat, "longitude": lon}
+        coords = {"latitude": lat, "longitude": lon}
+        return coords
 
-    def _fetch_weather(self):
+    @staticmethod
+    def fetch_weather(city: City):
         resp = requests.get(
             "https://api.open-meteo.com/v1/forecast",
             params={
-                "latitude": self.coords["latitude"],
-                "longitude": self.coords["longitude"],
-                "current": "temperature_2m",
+                "latitude": city.coords["latitude"],
+                "longitude": city.coords["longitude"],
+                "current": "temperature_2m,weather_code",
             },
         )
-
         data = resp.json()
         temperature = data["current"]["temperature_2m"]
-        return temperature
+        weather_code = data["current"]["weather_code"]
+        city.temperature = temperature
+        city.condition = weather_code
 
-    def show(self):
-        print(self.city)
-        print(self.coords)
-        print(self.temperature)
+    @staticmethod
+    def create_city(name: str) -> City:
+        coords = Service.geolocate(name)
+        return City(name=name, coords=coords)
 
 
-Berlin = Weather("Berlin")
-Berlin.show()
+Berlin = Service.create_city("Berlin")
+Service.fetch_weather(Berlin)
+print(Berlin)
