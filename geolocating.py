@@ -38,8 +38,3 @@ class Service:
     def create_city(name: str) -> City:
         coords = Service.geolocate(name)
         return City(name=name, coords=coords)
-
-
-Berlin = Service.create_city("Berlin")
-Service.fetch_weather(Berlin)
-print(Berlin)
