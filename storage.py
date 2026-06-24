@@ -27,3 +27,12 @@ class Storage:
     def get_all(self) -> list[City]:
         data = self._load_from_storage()
         return [City.model_validate(x) for x in data]
+
+    def get_one(self, index) -> City:
+        data = self._load_from_storage()
+        return City.model_validate(data[index])
+
+    def remove(self, index):
+        storage = self._load_from_storage()
+        storage.remove(storage[index])
+        self._save_storage(storage)
