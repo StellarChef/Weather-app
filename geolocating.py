@@ -13,8 +13,11 @@ class Service:
             params={"name": city_name, "format": "json"},
         )
         data = resp.json()
-        lat = data["results"][0]["latitude"]
-        lon = data["results"][0]["longitude"]
+        results = data.get("results")
+        if not results:
+            raise ValueError(f"City '{city_name}' not found")
+        lat = results[0]["latitude"]
+        lon = results[0]["longitude"]
         coords = {"latitude": lat, "longitude": lon}
         return coords
 

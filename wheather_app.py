@@ -21,6 +21,10 @@ class WheatherApp:
         self.cities.append(city)
         self.storage.add_to_storage(city)
 
+    def remove_city(self, index):
+        self.storage.remove(index)
+        self.cities.pop(index)
+
     def show(self):
         line = "=" * 42
         print(line)
@@ -32,10 +36,10 @@ class WheatherApp:
             print(line)
             return
 
-        for city in self.cities:
+        for index, city in enumerate(self.cities):
             lat = city.coords.get("latitude")
             lon = city.coords.get("longitude")
-            print(f"  📍 {city.name}")
+            print(f"{index}  📍 {city.name}")
             print(f"     coordinates : {lat}, {lon}")
             print(f"     temperature : {city.temperature} °C")
             print(f"     weather code: {city.condition}")
